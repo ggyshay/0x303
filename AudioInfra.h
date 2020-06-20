@@ -48,6 +48,11 @@ public:
         audioEngine.updateEffectsParams(paramLists[5][0].value, paramLists[5][1].value, paramLists[5][2].value, paramLists[5][3].value);
     }
 
+    void updateLFOParams()
+    {
+        audioEngine.updateLFOParams(paramLists[6][0].value, paramLists[6][1].value, paramLists[6][2].value, paramLists[6][3].value);
+    }
+
     void updateInfraParams()
     {
         audioEngine.updateInfraParams(paramLists[7][0].value);
@@ -74,6 +79,9 @@ public:
             break;
         case 5:
             updateEffectsParams();
+            break;
+        case 6:
+            updateLFOParams();
             break;
         case 7:
             updateInfraParams();
@@ -166,18 +174,27 @@ private:
         Value fxDist(0, 100.0, 0.0, "DISTORTION", 100);
         paramLists[5].push_back(fxDist);
 
-        Value fxDelayTime(0, 500.0, 60.0, "DELAY TIME", 100);
+        Value fxDelayTime(0, 500.0, 120.0, "DELAY TIME", 100);
         paramLists[5].push_back(fxDelayTime);
 
         Value fxDelayDryWet(0, 1.0, 0.0, "DEL DRYWET", 100);
         paramLists[5].push_back(fxDelayDryWet);
 
-        Value fxDelayFeedback(0, 1.0, 0.0, "DEL FEEDBACK", 100);
+        Value fxDelayFeedback(0, 1.0, 0.65, "DEL FEEDBACK", 100);
         paramLists[5].push_back(fxDelayFeedback);
 
         //LFO ------------------------------------------------------------
-        Value lfoNothing(0, 1.0, 0.0, "NOTHING", 20);
-        paramLists[6].push_back(lfoNothing);
+        Value lfoFrequency(1000.0, 1200.0, 1000.0, "AM FREQUENCY", 100, true);
+        paramLists[6].push_back(lfoFrequency);
+
+        Value lfoAmount(0.0, 1.0, 0.0, "AM AMOUNT", 100);
+        paramLists[6].push_back(lfoAmount);
+
+        Value lfo2Frequency(0.001, 200.0, 1.0, "FLT LFO", 100, true);
+        paramLists[6].push_back(lfo2Frequency);
+
+        Value lfo2Amount(0.0, 2.0, 0.0, "F LFO AMOUNT", 100);
+        paramLists[6].push_back(lfo2Amount);
 
         //GLOBAL -------------------------------------------
         Value globalVolume(0, 1.0, 0.3, "VOLUME", 100);

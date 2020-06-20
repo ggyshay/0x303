@@ -1,6 +1,6 @@
 #include <vector>
 #include <Audio.h> // tirar esse import generico e importar só o que precisa
-#include "Envelope2.h"
+#include "Envelope.h"
 #include "ValueInterface.h"
 #include "Constants.h"
 #include "waveform.h"
@@ -47,30 +47,38 @@ public:
         patchCord2 = new AudioConnection(waveform2, 0, mixer1, 1);
 
         patchCord3 = new AudioConnection(mixer1, 0, filter1, 0);
-        patchCord3 = new AudioConnection(fltEnv, filterModulationGain);
-        patchCord3 = new AudioConnection(filterModulationGain, 0, filter1, 1);
+        patchCord4 = new AudioConnection(fltEnv, 0, filterModulation, 0);
+        patchCord4 = new AudioConnection(LFO2, 0, filterModulation, 1);
+        patchCord5 = new AudioConnection(filterModulation, 0, filter1, 1);
 
-        patchCord4 = new AudioConnection(filter1, 0, mixer2, 0);
-        patchCord5 = new AudioConnection(filter1, 1, mixer2, 1);
-        patchCord6 = new AudioConnection(filter1, 2, mixer2, 2);
+        patchCord6 = new AudioConnection(filter1, 0, mixer2, 0);
+        patchCord7 = new AudioConnection(filter1, 1, mixer2, 1);
+        patchCord8 = new AudioConnection(filter1, 2, mixer2, 2);
 
-        patchCord7 = new AudioConnection(mixer2, 0, multiply1, 0);
-        patchCord8 = new AudioConnection(ampEnv, 0, multiply1, 1);
+        patchCord9 = new AudioConnection(mixer2, 0, multiply1, 0);
+        patchCord10 = new AudioConnection(ampEnv, 0, multiply1, 1);
 
-        patchCord9 = new AudioConnection(multiply1, distortion);
-        patchCord10 = new AudioConnection(distortion, 0, delayMixer, 0);
+        patchCord11 = new AudioConnection(multiply1, distortion);
+        patchCord12 = new AudioConnection(distortion, 0, delayMixer, 0);
 
-        patchCord11 = new AudioConnection(distortion, 0, delayDryWetMixer, 0);
-        patchCord12 = new AudioConnection(delayMixer, delayFx);
-        patchCord13 = new AudioConnection(delayFx, 0, delayMixer, 1);
-        patchCord14 = new AudioConnection(delayFx, 0, delayDryWetMixer, 1);
-        patchCord14 = new AudioConnection(delayDryWetMixer, outputGain);
+        patchCord13 = new AudioConnection(distortion, 0, delayDryWetMixer, 0);
+        patchCord14 = new AudioConnection(delayMixer, delayFx);
+        patchCord15 = new AudioConnection(delayFx, 0, delayMixer, 1);
+        patchCord16 = new AudioConnection(delayFx, 0, delayDryWetMixer, 1);
 
-        patchCord15 = new AudioConnection(outputGain, 0, i2s1, 0);
-        patchCord16 = new AudioConnection(outputGain, 0, i2s1, 1);
+        patchCord17 = new AudioConnection(delayDryWetMixer, 0, amFx, 0);
+        patchCord18 = new AudioConnection(LFO, 0, amFx, 1);
 
-        patchCord17 = new AudioConnection(outputGain, 0, usbOut, 0);
-        patchCord18 = new AudioConnection(outputGain, 0, usbOut, 1);
+        patchCord18 = new AudioConnection(amFx, 0, AMMixer, 0);
+        patchCord18 = new AudioConnection(delayDryWetMixer, 0, AMMixer, 1);
+
+        patchCord18 = new AudioConnection(AMMixer, outputGain);
+
+        patchCord19 = new AudioConnection(outputGain, 0, i2s1, 0);
+        patchCord20 = new AudioConnection(outputGain, 0, i2s1, 1);
+
+        patchCord21 = new AudioConnection(outputGain, 0, usbOut, 0);
+        patchCord22 = new AudioConnection(outputGain, 0, usbOut, 1);
 
         waveform1.begin(1.0, 440, WAVEFORM_SAWTOOTH);
 
@@ -84,6 +92,10 @@ public:
 
         delayFx.delay(0, 200);
         delayMixer.gain(1, 0.7);
+        LFO.frequency(1720);
+
+        setAMDryWet(0);
+        filterModulation.gain(1, 0);
     }
 
     Envelope ampEnv;
@@ -182,6 +194,12 @@ public:
         delayDryWetMixer.gain(1, amount);
     }
 
+    void setAMDryWet(float amount)
+    {
+        AMMixer.gain(0, amount);
+        AMMixer.gain(1, 1 - amount);
+    }
+
     void updateFilterParams(float frequency, float type, float resonance, float modAmount)
     {
         Serial.printf("frequency: %f, type %f, resonance: %f, modAmount: %f\n", frequency, type, resonance, modAmount);
@@ -191,7 +209,7 @@ public:
         changeFilterType(t);
 
         filter1.resonance(resonance);
-        filterModulationGain.gain(modAmount);
+        filterModulation.gain(0, modAmount);
         // filter1.octaveControl(modAmount);
     }
 
@@ -215,6 +233,15 @@ public:
         delayMixer.gain(1, delayFeedback);
     }
 
+    void updateLFOParams(float frequency, float amount, float frequency2, float amount2)
+    {
+        Serial.printf("f = %f; amount = %f\n", frequency, amount);
+        LFO.frequency(frequency);
+        LFO2.frequency(frequency2);
+        filterModulation.gain(1, amount2);
+        setAMDryWet(amount);
+    }
+
     void updateInfraParams(float volume)
     {
         Serial.println(volume);
@@ -235,9 +262,14 @@ private:
     AudioOutputI2S i2s1;
     AudioOutputUSB usbOut;
     AudioAmplifier outputGain;
-    AudioAmplifier filterModulationGain;
+    // AudioAmplifier filterModulationGain;
     AudioEffectWaveshaper distortion;
     AudioEffectDelay delayFx;
+    AudioEffectMultiply amFx;
+    AudioSynthWaveformSine LFO;
+    AudioSynthWaveformSine LFO2;
+    AudioMixer4 filterModulation;
+    AudioMixer4 AMMixer;
     float distCurve[129];
     int lastNote = 69;
 
@@ -259,5 +291,9 @@ private:
     AudioConnection *patchCord16;
     AudioConnection *patchCord17;
     AudioConnection *patchCord18;
+    AudioConnection *patchCord19;
+    AudioConnection *patchCord20;
+    AudioConnection *patchCord21;
+    AudioConnection *patchCord22;
     AudioControlSGTL5000 sgtl5000_1;
 };

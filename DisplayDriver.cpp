@@ -63,26 +63,26 @@ void DisplayDriver::init()
 
 void DisplayDriver::cls(char b)
 {
-    Wire.beginTransmission(0x3c);
-    Wire.write(0x00);
-    Wire.write(0x21);
-    Wire.write(0x00);
-    Wire.write(0x7f);
+    // Wire.beginTransmission(0x3c);
+    // Wire.write(0x00);
+    // Wire.write(0x21);
+    // Wire.write(0x00);
+    // Wire.write(0x7f);
 
-    Wire.write(0x22);
-    Wire.write(0);
-    Wire.write(0x07);
+    // Wire.write(0x22);
+    // Wire.write(0);
+    // Wire.write(0x07);
 
-    Wire.sendTransmission();
-    Wire.finish();
-    Wire.beginTransmission(0x3c);
-    Wire.write(0x40);
-    for (unsigned int n = 0; n < 1024; n++)
-    {
-        Wire.write(0x0);
-    }
-    Wire.sendTransmission();
-    Wire.finish();
+    // Wire.sendTransmission();
+    // Wire.finish();
+    // Wire.beginTransmission(0x3c);
+    // Wire.write(0x40);
+    // for (unsigned int n = 0; n < 1024; n++)
+    // {
+    //     Wire.write(0x0);
+    // }
+    // Wire.sendTransmission();
+    // Wire.finish();
 }
 
 void DisplayDriver::putScreen(const char *str1, const char *str2)

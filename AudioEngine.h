@@ -4,6 +4,7 @@
 #include "ValueInterface.h"
 #include "Constants.h"
 #include "waveform.h"
+#include "DCRemover.h"
 #define SPECIAL_WF 100
 
 struct OscillatorState_t
@@ -66,7 +67,8 @@ public:
         patchCord15 = new AudioConnection(delayFx, 0, delayMixer, 1);
         patchCord16 = new AudioConnection(delayFx, 0, delayDryWetMixer, 1);
 
-        patchCord17 = new AudioConnection(delayDryWetMixer, 0, amFx, 0);
+        patchCord17 = new AudioConnection(delayDryWetMixer, dcRemover);
+        patchCord17 = new AudioConnection(dcRemover, 0, amFx, 0);
         patchCord18 = new AudioConnection(LFO, 0, amFx, 1);
 
         patchCord18 = new AudioConnection(amFx, 0, AMMixer, 0);
@@ -124,7 +126,7 @@ public:
         waveform1.reset_phase();
         waveform2.reset_phase();
 
-        Serial.println("filter note on");
+        // Serial.println("filter note on");
         fltEnv.noteOn();
         // AudioInterrupts();
     }
@@ -135,7 +137,7 @@ public:
     }
     void updateWaveform1Params(char note, float semitones, float detune, char wf)
     {
-        Serial.printf("note: %d, semitones: %f, detune: %f, wf: %f\n", note, semitones, detune, wf);
+        // Serial.printf("note: %d, semitones: %f, detune: %f, wf: %f\n", note, semitones, detune, wf);
         wf1State.setState(note, semitones, detune, wf, 1);
         switch (wf)
         {
@@ -202,7 +204,7 @@ public:
 
     void updateFilterParams(float frequency, float type, float resonance, float modAmount)
     {
-        Serial.printf("frequency: %f, type %f, resonance: %f, modAmount: %f\n", frequency, type, resonance, modAmount);
+        // Serial.printf("frequency: %f, type %f, resonance: %f, modAmount: %f\n", frequency, type, resonance, modAmount);
         filter1.frequency(frequency);
 
         byte t = (char)(type);
@@ -225,17 +227,17 @@ public:
 
     void updateEffectsParams(float dist, float delayTime, float delayDryWet, float delayFeedback)
     {
-        setupWaveShaper(distCurve, 129, dist);
+        setupWaveShaper(distCurve, 129, dist); // coisas da distorção
         distortion.shape(distCurve, 129);
 
-        setDelayDryWet(delayDryWet);
-        delayFx.delay(0, (int)delayTime);
-        delayMixer.gain(1, delayFeedback);
+        setDelayDryWet(delayDryWet);       // dry wet
+        delayFx.delay(0, (int)delayTime);  // tempo de delay (tamanho do buffer de delay)
+        delayMixer.gain(1, delayFeedback); // multiplicador do sinal de feedback
     }
 
     void updateLFOParams(float frequency, float amount, float frequency2, float amount2)
     {
-        Serial.printf("f = %f; amount = %f\n", frequency, amount);
+        // Serial.printf("f = %f; amount = %f\n", frequency, amount);
         LFO.frequency(frequency);
         LFO2.frequency(frequency2);
         filterModulation.gain(1, amount2);
@@ -244,7 +246,7 @@ public:
 
     void updateInfraParams(float volume)
     {
-        Serial.println(volume);
+        // Serial.println(volume);
         outputGain.gain(volume);
     }
 
@@ -262,7 +264,7 @@ private:
     AudioOutputI2S i2s1;
     AudioOutputUSB usbOut;
     AudioAmplifier outputGain;
-    // AudioAmplifier filterModulationGain;
+    DCRemover dcRemover;
     AudioEffectWaveshaper distortion;
     AudioEffectDelay delayFx;
     AudioEffectMultiply amFx;

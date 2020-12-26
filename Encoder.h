@@ -62,7 +62,7 @@ public:
         if (list != nullptr)
         {
             selectedValueIndex = (selectedValueIndex + 1) % list->size();
-            Serial.println((*list)[selectedValueIndex].value);
+            // Serial.println((*list)[selectedValueIndex].value);
         }
     }
     int value = 0;

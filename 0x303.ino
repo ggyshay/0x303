@@ -12,13 +12,14 @@ int POT_DICT[8] = {3, 2, 1, 0, 7, 6, 5, 4};
 void setup()
 {
   Serial.begin(112500);
+  while(!Serial);
   Serial.print("serial has begun\n");
   audioInfra.begin();
   Serial.print("audio infra started\n");
   portSetup();
 
   disp->init();
-  disp->putScreen("TESTE", "TESSTE");
+  disp->putScreen("0X303", "BEGIN");
   Serial.print("port setup complete\n");
 
   for (byte i = 0; i < 8; ++i)

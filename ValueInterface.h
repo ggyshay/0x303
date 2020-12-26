@@ -1,6 +1,6 @@
-#include <vector>
+// #include <vector>
 #include "Arduino.h"
-#include <functional>
+// #include <functional>
 #ifndef INSTRUMENTINTERFACE_H
 #define INSTRUMENTINTERFACE_H
 
@@ -26,9 +26,6 @@ public:
     }
     float value;
     const char *nameTag;
-    //    float setValue(int input) { //0 a 40
-    //      return value = min(max(angular * input + linear, _min), _max);
-    //    }
 
     void increment()
     {

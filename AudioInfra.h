@@ -132,7 +132,7 @@ private:
         paramLists[1].push_back(wf2Level);
 
         //FILTER -----------------------------------------------------
-        Value fltFrequencyValue(55.0, 7040.0, 7000.0, "FREQUENCY", 144, true);
+        Value fltFrequencyValue(55.0, 7040.0, 5300.0, "FREQUENCY", 144, true);
         paramLists[2].push_back(fltFrequencyValue);
 
         Value fltTypeValue(0.0, 2.0, 0.0, "TYPE", 2);
@@ -184,7 +184,7 @@ private:
         paramLists[5].push_back(fxDelayFeedback);
 
         //LFO ------------------------------------------------------------
-        Value lfoFrequency(1000.0, 1200.0, 1000.0, "AM FREQUENCY", 100, true);
+        Value lfoFrequency(100.0, 1200.0, 1000.0, "AM FREQUENCY", 100, true);
         paramLists[6].push_back(lfoFrequency);
 
         Value lfoAmount(0.0, 1.0, 0.0, "AM AMOUNT", 100);
